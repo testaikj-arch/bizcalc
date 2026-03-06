@@ -6,441 +6,708 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0d0f14">
+<meta name="theme-color" content="#1c1c1c">
 <title>BizCalc</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-:root{
-  --bg:#0d0f14;--surface:#161921;--card:#1c2030;--border:#272c3d;
-  --accent:#f0b429;--accent2:#3ecfcf;--accent3:#ff6b6b;
-  --text:#e8eaf0;--muted:#6b7394;--green:#52d68a;
-  --nav-h:68px;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* ════════════════════════════════════
+   CSS VARIABLES — Dark (default)
+════════════════════════════════════ */
+:root {
+  --bg:         #1c1c1c;
+  --bg2:        #252525;
+  --surface:    #2a2a2a;
+  --border:     #383838;
+  --btn-num:    #2d2d2d;
+  --btn-fn:     #404040;
+  --btn-op:     #f59e0b;
+  --btn-op-act: #fbbf24;
+  --text:       #ffffff;
+  --text-sub:   #888888;
+  --text-expr:  #666666;
+  --green:      #4ade80;
+  --red:        #f87171;
+  --blue:       #60a5fa;
+  --orange:     #f59e0b;
+  --nav-h:      64px;
+  --font:       'Inter', -apple-system, sans-serif;
+  --radius-btn: 36px;
 }
-html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;flex-direction:column;
-  background-image:radial-gradient(ellipse at 20% 0%,rgba(240,180,41,0.07) 0%,transparent 50%);}
 
-/* ── HEADER ── */
-.app-header{height:54px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  border-bottom:1px solid var(--border);background:var(--bg);}
-.app-header h1{font-size:20px;font-weight:800;
-  background:linear-gradient(135deg,#fff 30%,var(--accent) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-
-/* ── SCROLL ── */
-.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
-  padding:12px 12px calc(var(--nav-h) + 16px);}
-.card{display:none;animation:fadeIn 0.18s ease;}
-.card.active{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-
-/* ── FORM FIELDS ── */
-.card-title{font-size:19px;font-weight:800;margin-bottom:2px;}
-.card-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:16px;}
-.field{margin-bottom:11px;}
-.field label{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);
-  letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
-.field input,.field select{width:100%;background:var(--surface);border:1.5px solid var(--border);
-  border-radius:10px;color:var(--text);font-family:var(--mono);font-size:17px;padding:13px 14px;
-  outline:none;transition:border-color 0.2s;-webkit-appearance:none;appearance:none;}
-.field input:focus,.field select:focus{border-color:var(--accent);}
-.field select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7394' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
-.field select option{background:#1c2030;}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.go-btn{width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:#0d0f14;
-  font-family:var(--sans);font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;
-  transition:opacity 0.12s,transform 0.08s;}
-.go-btn:active{transform:scale(0.97);opacity:0.82;}
-
-/* ── RESULT BOX ── */
-.result-box{margin-top:13px;background:var(--surface);border:1.5px solid var(--border);
-  border-radius:14px;display:none;overflow:hidden;}
-.result-box.show{display:block;animation:fadeIn 0.18s ease;}
-.rrow{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;
-  border-bottom:1px solid var(--border);}
-.rrow:last-child{border-bottom:none;}
-.rrow.big{background:rgba(240,180,41,0.06);}
-.rkey{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.5px;
-  text-transform:uppercase;flex-shrink:0;margin-right:8px;}
-.rval{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--text);text-align:right;}
-.rval.hi{color:var(--accent);font-size:20px;font-weight:700;}
-.rval.green{color:var(--green);}
-.rval.red{color:var(--accent3);}
-.rval.teal{color:var(--accent2);}
-.rnote{font-family:var(--mono);font-size:11px;color:var(--muted);padding:10px 14px;line-height:1.6;
-  border-top:1px solid var(--border);border-left:3px solid var(--accent);
-  background:rgba(240,180,41,0.04);}
-
-/* ══════════════════════════════════════
-   CALCULATOR LAYOUT
-══════════════════════════════════════ */
-.calc-display{
-  background:var(--surface);border:1.5px solid var(--border);border-radius:16px;
-  padding:14px 18px 16px;margin-bottom:10px;min-height:116px;
-  display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
+/* Light theme override */
+body.light {
+  --bg:         #ebebeb;
+  --bg2:        #e0e0e0;
+  --surface:    #f5f5f5;
+  --border:     #d0d0d0;
+  --btn-num:    #ffffff;
+  --btn-fn:     #d8d8d8;
+  --btn-op:     #f59e0b;
+  --btn-op-act: #fbbf24;
+  --text:       #1a1a1a;
+  --text-sub:   #777777;
+  --text-expr:  #999999;
 }
-.calc-history-line{
-  font-family:var(--mono);font-size:13px;color:var(--muted);
-  text-align:right;min-height:20px;word-break:break-all;line-height:1.5;
-  margin-bottom:2px;
+
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  display: flex;
+  flex-direction: column;
+  transition: background 0.25s, color 0.25s;
 }
-.calc-number{
-  font-family:var(--mono);font-weight:400;color:var(--text);
-  text-align:right;word-break:break-all;line-height:1.05;
+
+/* ════════════════════════════════════
+   SCROLL AREA
+════════════════════════════════════ */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0 calc(var(--nav-h) + 8px);
+}
+.tab { display: none; animation: fadeUp 0.15s ease; }
+.tab.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+/* ════════════════════════════════════
+   CALCULATOR TAB
+════════════════════════════════════ */
+.calc-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--nav-h));
+  padding: 0;
+}
+
+/* ── Display ── */
+.display {
+  flex-shrink: 0;
+  padding: 12px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 130px;
+}
+.expr-line {
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--text-expr);
+  text-align: right;
+  min-height: 22px;
+  word-break: break-all;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  letter-spacing: 0.2px;
+}
+.num-line {
+  font-weight: 300;
+  color: var(--text);
+  text-align: right;
+  word-break: break-all;
+  line-height: 1.0;
+  letter-spacing: -1px;
   /* font-size set by JS */
 }
-.calc-tag{
-  font-family:var(--mono);font-size:10px;color:var(--accent);
-  letter-spacing:1px;text-transform:uppercase;
-  text-align:right;min-height:16px;margin-top:4px;
+.tag-line {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--orange);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-align: right;
+  min-height: 16px;
+  margin-top: 5px;
 }
 
-/* ── QUICK CHIPS ── */
-.chips-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
-.chip{
-  padding:6px 12px;border-radius:18px;border:1.5px solid var(--border);
-  background:var(--surface);color:var(--muted);font-family:var(--mono);
-  font-size:11px;cursor:pointer;transition:all 0.12s;white-space:nowrap;
+/* ── Business chips ── */
+.chips-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 6px 16px 6px;
+  flex-shrink: 0;
 }
-.chip:active{transform:scale(0.93);}
-.chip.on{background:rgba(240,180,41,0.13);border-color:var(--accent);color:var(--accent);}
-
-/* ── QUICK PANEL ── */
-.qpanel{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
-  padding:14px;margin-bottom:10px;display:none;}
-.qpanel.show{display:block;animation:fadeIn 0.15s ease;}
-.qp-title{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:1px;
-  text-transform:uppercase;margin-bottom:10px;}
-.qp-hint{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
-.qp-row{display:flex;gap:8px;align-items:center;margin-bottom:0;}
-.qp-inp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;
-  color:var(--text);font-family:var(--mono);font-size:16px;padding:11px 12px;
-  outline:none;-webkit-appearance:none;appearance:none;min-width:0;}
-.qp-inp:focus{border-color:var(--accent);}
-.qp-sel{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;
-  color:var(--text);font-family:var(--mono);font-size:14px;padding:11px 28px 11px 10px;
-  outline:none;-webkit-appearance:none;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7394' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 10px center;min-width:0;}
-.qp-sel option{background:#1c2030;}
-.qp-go{padding:11px 16px;border-radius:8px;border:none;background:var(--accent);color:#0d0f14;
-  font-family:var(--mono);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-.qp-go:active{opacity:0.78;}
-.qp-out{font-family:var(--mono);font-size:13px;margin-top:10px;padding:12px 14px;
-  border-radius:10px;display:none;white-space:pre-line;line-height:1.85;}
-.qp-out.show{display:block;}
-.qp-out.ok{color:var(--green);background:rgba(82,214,138,0.07);border:1px solid rgba(82,214,138,0.2);}
-.qp-out.err{color:var(--accent3);background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);}
-
-/* ── NUMPAD ── */
-.numpad{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:2px;}
-.key{
-  height:70px;border-radius:14px;border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;user-select:none;-webkit-user-select:none;
-  font-family:var(--mono);transition:transform 0.07s,background 0.07s;
-  -webkit-touch-callout:none;
+.chips-scroll::-webkit-scrollbar { display: none; }
+.chips-row {
+  display: flex;
+  gap: 7px;
+  width: max-content;
 }
-.key:active{transform:scale(0.90);}
-.key.num{background:var(--card);color:var(--text);font-size:24px;}
-.key.num:active{background:#252a3a;}
-.key.op{background:#1e2535;color:var(--accent);font-size:26px;}
-.key.op:active{background:#2a3045;}
-.key.op.active-op{background:var(--accent);color:#0d0f14;}
-.key.fn{background:var(--surface);color:var(--muted);font-size:16px;}
-.key.fn:active{background:var(--border);}
-.key.del{color:var(--accent3);}
-.key.eq{background:var(--accent);color:#0d0f14;font-size:28px;font-weight:700;border-color:var(--accent);}
-.key.eq:active{background:#c9921a;}
-.key.span2{grid-column:span 2;}
+.chip {
+  padding: 6px 14px;
+  border-radius: 18px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-sub);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s;
+  font-family: var(--font);
+}
+.chip:active { transform: scale(0.93); }
+.chip.on { background: rgba(245,158,11,0.15); border-color: var(--orange); color: var(--orange); }
 
-/* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);
-  background:var(--surface);border-top:1px solid var(--border);
-  display:flex;align-items:stretch;z-index:100;
-  padding-bottom:env(safe-area-inset-bottom);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;cursor:pointer;border:none;background:none;color:var(--muted);
-  font-family:var(--mono);font-size:9px;letter-spacing:0.3px;text-transform:uppercase;
-  padding:6px 2px;transition:color 0.12s;}
-.nav-btn svg{width:20px;height:20px;stroke-width:1.8;fill:none;stroke:currentColor;}
-.nav-btn.active{color:var(--accent);}
+/* ── Quick panels ── */
+.panels-wrap { padding: 0 12px; flex-shrink: 0; }
+.qpanel {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 8px;
+  display: none;
+}
+.qpanel.show { display: block; animation: fadeUp 0.13s ease; }
+.qp-title { font-size: 11px; font-weight: 700; color: var(--orange); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+.qp-hint  { font-size: 12px; color: var(--text-sub); margin-bottom: 10px; line-height: 1.5; }
+.qp-row   { display: flex; gap: 8px; align-items: center; }
+.qp-inp {
+  flex: 1; min-width: 0;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  padding: 10px 12px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.qp-inp:focus { border-color: var(--orange); }
+.qp-sel {
+  flex: 1; min-width: 0;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 10px 28px 10px 10px;
+  outline: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.qp-sel option { background: #2d2d2d; }
+body.light .qp-sel option { background: #f0f0f0; }
+.qp-go {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.qp-go:active { opacity: 0.78; }
+.qp-out {
+  font-size: 13px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  display: none;
+  white-space: pre-line;
+  line-height: 1.9;
+  font-weight: 400;
+  font-family: var(--font);
+}
+.qp-out.show { display: block; }
+.qp-out.ok  { color: var(--green); background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); }
+.qp-out.err { color: var(--red);   background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); }
 
-/* ── HISTORY LOG ── */
-.hist-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;
-  padding:11px 13px;margin-bottom:9px;}
-.hist-top{display:flex;justify-content:space-between;margin-bottom:3px;gap:8px;}
-.hist-badge{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:1px;
-  text-transform:uppercase;background:rgba(240,180,41,0.1);padding:2px 7px;
-  border-radius:4px;white-space:nowrap;}
-.hist-res{font-family:var(--mono);font-size:14px;color:var(--green);font-weight:500;text-align:right;}
-.hist-desc{font-family:var(--mono);font-size:12px;color:var(--muted);}
-.no-hist{text-align:center;color:var(--muted);font-family:var(--mono);font-size:13px;
-  padding:40px 0;line-height:2.2;}
-.clr-btn{width:100%;padding:13px;border-radius:10px;border:1.5px solid var(--border);
-  background:transparent;color:var(--accent3);font-family:var(--mono);font-size:13px;
-  cursor:pointer;margin-top:6px;}
-.clr-btn:active{opacity:0.7;}
+/* ── Numpad ── */
+.numpad {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 10px;
+  padding: 6px 12px 10px;
+}
+
+/* Samsung squircle button */
+.key {
+  border-radius: var(--radius-btn);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  font-family: var(--font);
+  font-weight: 400;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.07s, filter 0.07s;
+}
+.key:active { transform: scale(0.88); }
+.key.num  { background: var(--btn-num); color: var(--text); font-size: 26px; }
+.key.fn   { background: var(--btn-fn);  color: var(--text); font-size: 18px; font-weight: 500; }
+.key.op   { background: var(--btn-op);  color: #fff; font-size: 28px; font-weight: 300; }
+.key.op.lit { background: var(--btn-op-act); }
+.key.eq   { background: var(--btn-op);  color: #fff; font-size: 30px; font-weight: 300; }
+.key.eq:active { background: var(--btn-op-act); }
+.key.zero { grid-column: span 2; justify-content: flex-start; padding-left: 32px; font-size: 26px; }
+
+/* Shadow for light mode number keys */
+body.light .key.num { box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+body.light .key.fn  { box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
+
+/* ════════════════════════════════════
+   BUSINESS FORM TABS
+════════════════════════════════════ */
+.form-pad { padding: 14px 14px; }
+.t-title { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+.t-sub   { font-size: 12px; color: var(--text-sub); margin-bottom: 16px; }
+.field   { margin-bottom: 10px; }
+.field label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-sub);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.field input, .field select {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 13px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.field input:focus, .field select:focus { border-color: var(--orange); }
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+}
+.field select option { background: #2d2d2d; }
+body.light .field select option { background: #f0f0f0; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.go-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 14px;
+  border: none;
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: opacity 0.12s, transform 0.08s;
+}
+.go-btn:active { transform: scale(0.97); opacity: 0.85; }
+
+/* Result box */
+.res-box { margin-top: 12px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; display: none; overflow: hidden; }
+.res-box.show { display: block; animation: fadeUp 0.15s ease; }
+.rr { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.rr:last-child { border-bottom: none; }
+.rr.hl { background: rgba(245,158,11,0.06); }
+.rk { font-size: 11px; color: var(--text-sub); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; flex-shrink: 0; margin-right: 8px; }
+.rv { font-size: 15px; font-weight: 600; color: var(--text); text-align: right; }
+.rv.accent { color: var(--orange); font-size: 21px; }
+.rv.green  { color: var(--green); }
+.rv.red    { color: var(--red); }
+.rv.blue   { color: var(--blue); }
+.rnote {
+  font-size: 11px; color: var(--text-sub); padding: 10px 14px; line-height: 1.6;
+  border-top: 1px solid var(--border); border-left: 3px solid var(--orange);
+  background: rgba(245,158,11,0.04);
+}
+
+/* ════════════════════════════════════
+   BOTTOM NAV
+════════════════════════════════════ */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: stretch; z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nb {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer; border: none; background: none;
+  color: var(--text-sub);
+  font-size: 9px; letter-spacing: 0.3px; text-transform: uppercase; font-weight: 500;
+  padding: 6px 2px;
+  transition: color 0.12s;
+  font-family: var(--font);
+}
+.nb svg { width: 20px; height: 20px; stroke-width: 1.8; fill: none; stroke: currentColor; }
+.nb.active { color: var(--orange); }
+
+/* Theme toggle in corner */
+.theme-fab {
+  position: fixed;
+  top: 12px; right: 14px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--btn-fn);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: background 0.2s;
+}
+
+/* ════════════════════════════════════
+   HISTORY
+════════════════════════════════════ */
+.hist-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 11px 14px; margin-bottom: 9px;
+}
+.hist-top { display: flex; justify-content: space-between; margin-bottom: 3px; gap: 8px; align-items: flex-start; }
+.hist-badge {
+  font-size: 10px; color: var(--orange); letter-spacing: 1px; text-transform: uppercase;
+  background: rgba(245,158,11,0.12); padding: 2px 8px; border-radius: 5px;
+  font-weight: 700; white-space: nowrap;
+}
+.hist-val  { font-size: 14px; color: var(--green); font-weight: 600; text-align: right; }
+.hist-desc { font-size: 12px; color: var(--text-sub); }
+.no-hist { text-align: center; color: var(--text-sub); font-size: 13px; padding: 50px 0; line-height: 2.4; }
+.clr-btn {
+  width: 100%; padding: 13px; border-radius: 12px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--red); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 6px;
+}
+.clr-btn:active { opacity: 0.7; }
 </style>
 </head>
 <body>
 
-<div class="app-header"><h1>⚡ BizCalc</h1></div>
-<div class="scroll-area">
+<!-- Theme toggle always visible -->
+<button class="theme-fab" id="theme-fab" onclick="toggleTheme()">🌙</button>
 
-<!-- ════════════════════════════════════════
+<div class="scroll" id="scroll">
+
+<!-- ════════════════════════════════════
      TAB: CALCULATOR
-════════════════════════════════════════ -->
-<div class="card active" id="tab-calc">
+════════════════════════════════════ -->
+<div class="tab active" id="tab-calc">
+<div class="calc-wrap">
 
   <!-- Display -->
-  <div class="calc-display">
-    <div class="calc-history-line" id="c-hist"></div>
-    <div class="calc-number" id="c-num">0</div>
-    <div class="calc-tag" id="c-tag"></div>
+  <div class="display">
+    <div class="expr-line" id="c-expr"></div>
+    <div class="num-line"  id="c-num">0</div>
+    <div class="tag-line"  id="c-tag"></div>
   </div>
 
-  <!-- Business Chips -->
-  <div class="chips-wrap">
-    <button class="chip" id="chip-gst18"    onclick="chipToggle('gst18')">+GST 18%</button>
-    <button class="chip" id="chip-gst12"    onclick="chipToggle('gst12')">+GST 12%</button>
-    <button class="chip" id="chip-gst5"     onclick="chipToggle('gst5')">+GST 5%</button>
-    <button class="chip" id="chip-rmgst"    onclick="chipToggle('rmgst')">−GST</button>
-    <button class="chip" id="chip-margin"   onclick="chipToggle('margin')">Margin %</button>
-    <button class="chip" id="chip-markup"   onclick="chipToggle('markup')">Markup %</button>
-    <button class="chip" id="chip-discount" onclick="chipToggle('discount')">Discount</button>
-    <button class="chip" id="chip-split"    onclick="chipToggle('split')">Split Bill</button>
-  </div>
-
-  <!-- Panels -->
-  <div class="qpanel" id="qp-gst18">
-    <div class="qp-title">➕ Add GST 18%</div>
-    <div class="qp-hint">Uses the number on screen as your base/inclusive amount.</div>
-    <div class="qp-row">
-      <select class="qp-sel" id="sel-gst18"><option value="add">Add GST to amount</option><option value="rm">Remove GST from amount</option></select>
-      <button class="qp-go" onclick="doGST(18,'sel-gst18','out-gst18')">Calculate</button>
+  <!-- Chips (horizontally scrollable) -->
+  <div class="chips-scroll">
+    <div class="chips-row">
+      <button class="chip" id="chip-gst18"    onclick="chipToggle('gst18')">+GST 18%</button>
+      <button class="chip" id="chip-gst12"    onclick="chipToggle('gst12')">+GST 12%</button>
+      <button class="chip" id="chip-gst5"     onclick="chipToggle('gst5')">+GST 5%</button>
+      <button class="chip" id="chip-rmgst"    onclick="chipToggle('rmgst')">−GST</button>
+      <button class="chip" id="chip-margin"   onclick="chipToggle('margin')">Margin %</button>
+      <button class="chip" id="chip-markup"   onclick="chipToggle('markup')">Markup %</button>
+      <button class="chip" id="chip-discount" onclick="chipToggle('discount')">Discount</button>
+      <button class="chip" id="chip-split"    onclick="chipToggle('split')">Bill Split</button>
     </div>
-    <div class="qp-out" id="out-gst18"></div>
   </div>
 
-  <div class="qpanel" id="qp-gst12">
-    <div class="qp-title">➕ Add GST 12%</div>
-    <div class="qp-hint">Uses the number on screen as your base/inclusive amount.</div>
-    <div class="qp-row">
-      <select class="qp-sel" id="sel-gst12"><option value="add">Add GST to amount</option><option value="rm">Remove GST from amount</option></select>
-      <button class="qp-go" onclick="doGST(12,'sel-gst12','out-gst12')">Calculate</button>
-    </div>
-    <div class="qp-out" id="out-gst12"></div>
-  </div>
+  <!-- Quick panels -->
+  <div class="panels-wrap">
 
-  <div class="qpanel" id="qp-gst5">
-    <div class="qp-title">➕ GST 5%</div>
-    <div class="qp-hint">Uses the number on screen as your base/inclusive amount.</div>
-    <div class="qp-row">
-      <select class="qp-sel" id="sel-gst5"><option value="add">Add GST to amount</option><option value="rm">Remove GST from amount</option></select>
-      <button class="qp-go" onclick="doGST(5,'sel-gst5','out-gst5')">Calculate</button>
+    <div class="qpanel" id="qp-gst18">
+      <div class="qp-title">GST @ 18%</div>
+      <div class="qp-hint">Type amount on calculator → select Add or Remove → tap Calculate</div>
+      <div class="qp-row">
+        <select class="qp-sel" id="sel-gst18">
+          <option value="add">Add GST  (base price → inclusive)</option>
+          <option value="rm">Remove GST  (inclusive → base price)</option>
+        </select>
+        <button class="qp-go" onclick="doGST(18,'sel-gst18','gst18')">Calc</button>
+      </div>
+      <div class="qp-out" id="out-gst18"></div>
     </div>
-    <div class="qp-out" id="out-gst5"></div>
-  </div>
 
-  <div class="qpanel" id="qp-rmgst">
-    <div class="qp-title">➖ Remove GST</div>
-    <div class="qp-hint">Enter GST-inclusive amount on screen, pick rate, get base price.</div>
-    <div class="qp-row">
-      <select class="qp-sel" id="sel-rmrate">
-        <option value="5">5%</option><option value="12">12%</option>
-        <option value="18" selected>18%</option><option value="28">28%</option>
-      </select>
-      <button class="qp-go" onclick="doRmGST()">Calculate</button>
+    <div class="qpanel" id="qp-gst12">
+      <div class="qp-title">GST @ 12%</div>
+      <div class="qp-hint">Type amount on calculator → select Add or Remove → tap Calculate</div>
+      <div class="qp-row">
+        <select class="qp-sel" id="sel-gst12">
+          <option value="add">Add GST  (base price → inclusive)</option>
+          <option value="rm">Remove GST  (inclusive → base price)</option>
+        </select>
+        <button class="qp-go" onclick="doGST(12,'sel-gst12','gst12')">Calc</button>
+      </div>
+      <div class="qp-out" id="out-gst12"></div>
     </div>
-    <div class="qp-out" id="out-rmgst"></div>
-  </div>
 
-  <div class="qpanel" id="qp-margin">
-    <div class="qp-title">📈 Margin %</div>
-    <div class="qp-hint">Screen value = Cost Price. Enter desired margin to get Selling Price.</div>
-    <div class="qp-row">
-      <input class="qp-inp" type="number" id="inp-margin" placeholder="Margin % e.g. 30" inputmode="decimal">
-      <button class="qp-go" onclick="doMargin()">Calculate</button>
+    <div class="qpanel" id="qp-gst5">
+      <div class="qp-title">GST @ 5%</div>
+      <div class="qp-hint">Type amount on calculator → select Add or Remove → tap Calculate</div>
+      <div class="qp-row">
+        <select class="qp-sel" id="sel-gst5">
+          <option value="add">Add GST  (base price → inclusive)</option>
+          <option value="rm">Remove GST  (inclusive → base price)</option>
+        </select>
+        <button class="qp-go" onclick="doGST(5,'sel-gst5','gst5')">Calc</button>
+      </div>
+      <div class="qp-out" id="out-gst5"></div>
     </div>
-    <div class="qp-out" id="out-margin"></div>
-  </div>
 
-  <div class="qpanel" id="qp-markup">
-    <div class="qp-title">📊 Markup %</div>
-    <div class="qp-hint">Screen value = Cost Price. Enter desired markup to get Selling Price.</div>
-    <div class="qp-row">
-      <input class="qp-inp" type="number" id="inp-markup" placeholder="Markup % e.g. 40" inputmode="decimal">
-      <button class="qp-go" onclick="doMarkup()">Calculate</button>
+    <div class="qpanel" id="qp-rmgst">
+      <div class="qp-title">Remove GST — any rate</div>
+      <div class="qp-hint">Type GST-INCLUSIVE amount on screen. Choose rate to extract base price.</div>
+      <div class="qp-row">
+        <select class="qp-sel" id="sel-rmrate">
+          <option value="5">5%</option>
+          <option value="12">12%</option>
+          <option value="18" selected>18%</option>
+          <option value="28">28%</option>
+        </select>
+        <button class="qp-go" onclick="doRmGST()">Calc</button>
+      </div>
+      <div class="qp-out" id="out-rmgst"></div>
     </div>
-    <div class="qp-out" id="out-markup"></div>
-  </div>
 
-  <div class="qpanel" id="qp-discount">
-    <div class="qp-title">🏷 Discount</div>
-    <div class="qp-hint">Screen value = Original Price. Enter discount to get final price.</div>
-    <div class="qp-row">
-      <input class="qp-inp" type="number" id="inp-dval" placeholder="Discount value" inputmode="decimal">
-      <select class="qp-sel" id="sel-dtype"><option value="pct">%</option><option value="flat">₹ flat</option></select>
-      <button class="qp-go" onclick="doDiscount()">Calculate</button>
+    <div class="qpanel" id="qp-margin">
+      <div class="qp-title">Gross Margin %</div>
+      <div class="qp-hint">Screen value = COST PRICE. Enter desired margin % to find selling price.</div>
+      <div class="qp-row">
+        <input class="qp-inp" type="number" id="inp-margin" placeholder="Margin % (e.g. 30)" inputmode="decimal">
+        <button class="qp-go" onclick="doMargin()">Calc</button>
+      </div>
+      <div class="qp-out" id="out-margin"></div>
     </div>
-    <div class="qp-out" id="out-discount"></div>
-  </div>
 
-  <div class="qpanel" id="qp-split">
-    <div class="qp-title">🍽 Split Bill</div>
-    <div class="qp-hint">Screen value = Total Bill. Enter number of people.</div>
-    <div class="qp-row">
-      <input class="qp-inp" type="number" id="inp-split" placeholder="No. of people" inputmode="numeric">
-      <button class="qp-go" onclick="doSplit()">Calculate</button>
+    <div class="qpanel" id="qp-markup">
+      <div class="qp-title">Markup %</div>
+      <div class="qp-hint">Screen value = COST PRICE. Enter desired markup % to find selling price.</div>
+      <div class="qp-row">
+        <input class="qp-inp" type="number" id="inp-markup" placeholder="Markup % (e.g. 40)" inputmode="decimal">
+        <button class="qp-go" onclick="doMarkup()">Calc</button>
+      </div>
+      <div class="qp-out" id="out-markup"></div>
     </div>
-    <div class="qp-out" id="out-split"></div>
-  </div>
+
+    <div class="qpanel" id="qp-discount">
+      <div class="qp-title">Discount</div>
+      <div class="qp-hint">Screen value = ORIGINAL PRICE. Enter discount value to get final price.</div>
+      <div class="qp-row">
+        <input class="qp-inp" type="number" id="inp-dval" placeholder="Value" inputmode="decimal">
+        <select class="qp-sel" id="sel-dtype">
+          <option value="pct">% off</option>
+          <option value="flat">₹ flat off</option>
+        </select>
+        <button class="qp-go" onclick="doDiscount()">Calc</button>
+      </div>
+      <div class="qp-out" id="out-discount"></div>
+    </div>
+
+    <div class="qpanel" id="qp-split">
+      <div class="qp-title">Split Bill</div>
+      <div class="qp-hint">Screen value = TOTAL BILL. Enter number of people to split equally.</div>
+      <div class="qp-row">
+        <input class="qp-inp" type="number" id="inp-split" placeholder="No. of people" inputmode="numeric">
+        <button class="qp-go" onclick="doSplit()">Calc</button>
+      </div>
+      <div class="qp-out" id="out-split"></div>
+    </div>
+
+  </div><!-- /panels-wrap -->
 
   <!-- Numpad -->
   <div class="numpad">
-    <button class="key fn"        id="key-ac"  ontouchstart="" onclick="K('AC')">AC</button>
-    <button class="key fn"        id="key-pm"  ontouchstart="" onclick="K('+/-')">+/−</button>
-    <button class="key fn"        id="key-pct" ontouchstart="" onclick="K('%')">%</button>
-    <button class="key op"        id="key-div" ontouchstart="" onclick="K('/')">÷</button>
+    <button class="key fn"   id="key-ac"  ontouchstart="" onclick="K('AC')">C</button>
+    <button class="key fn"   id="key-del" ontouchstart="" onclick="K('DEL')" style="color:#f87171;font-size:22px">⌫</button>
+    <button class="key fn"   id="key-pct" ontouchstart="" onclick="K('%')">%</button>
+    <button class="key op"   id="key-div" ontouchstart="" onclick="K('/')">÷</button>
 
-    <button class="key num"       ontouchstart="" onclick="K('7')">7</button>
-    <button class="key num"       ontouchstart="" onclick="K('8')">8</button>
-    <button class="key num"       ontouchstart="" onclick="K('9')">9</button>
-    <button class="key op"        id="key-mul" ontouchstart="" onclick="K('*')">×</button>
+    <button class="key num"  ontouchstart="" onclick="K('7')">7</button>
+    <button class="key num"  ontouchstart="" onclick="K('8')">8</button>
+    <button class="key num"  ontouchstart="" onclick="K('9')">9</button>
+    <button class="key op"   id="key-mul" ontouchstart="" onclick="K('*')">×</button>
 
-    <button class="key num"       ontouchstart="" onclick="K('4')">4</button>
-    <button class="key num"       ontouchstart="" onclick="K('5')">5</button>
-    <button class="key num"       ontouchstart="" onclick="K('6')">6</button>
-    <button class="key op"        id="key-sub" ontouchstart="" onclick="K('-')">−</button>
+    <button class="key num"  ontouchstart="" onclick="K('4')">4</button>
+    <button class="key num"  ontouchstart="" onclick="K('5')">5</button>
+    <button class="key num"  ontouchstart="" onclick="K('6')">6</button>
+    <button class="key op"   id="key-sub" ontouchstart="" onclick="K('-')">−</button>
 
-    <button class="key num"       ontouchstart="" onclick="K('1')">1</button>
-    <button class="key num"       ontouchstart="" onclick="K('2')">2</button>
-    <button class="key num"       ontouchstart="" onclick="K('3')">3</button>
-    <button class="key op"        id="key-add" ontouchstart="" onclick="K('+')">+</button>
+    <button class="key num"  ontouchstart="" onclick="K('1')">1</button>
+    <button class="key num"  ontouchstart="" onclick="K('2')">2</button>
+    <button class="key num"  ontouchstart="" onclick="K('3')">3</button>
+    <button class="key op"   id="key-add" ontouchstart="" onclick="K('+')">+</button>
 
-    <button class="key num span2" ontouchstart="" onclick="K('0')">0</button>
-    <button class="key fn"        ontouchstart="" onclick="K('.')">.</button>
-    <button class="key eq"        ontouchstart="" onclick="K('=')">=</button>
+    <button class="key num zero" ontouchstart="" onclick="K('0')">0</button>
+    <button class="key fn"       ontouchstart="" onclick="K('.')">.</button>
+    <button class="key eq"       ontouchstart="" onclick="K('=')">=</button>
   </div>
-</div>
 
-<!-- ════ GST ════ -->
-<div class="card" id="tab-gst">
-  <div class="card-title">GST Calculator</div>
-  <div class="card-sub">Add or remove GST — shows CGST & SGST split</div>
+</div><!-- /calc-wrap -->
+</div><!-- /tab-calc -->
+
+<!-- ════ GST TAB ════ -->
+<div class="tab" id="tab-gst">
+<div class="form-pad">
+  <div class="t-title">GST Calculator</div>
+  <div class="t-sub">Add GST to base price · Remove GST from inclusive price</div>
+
   <div class="field"><label>Amount (₹)</label>
-    <input type="number" id="g-amt" placeholder="e.g. 10000" inputmode="decimal"></div>
+    <input type="number" id="g-amt" placeholder="Enter amount" inputmode="decimal"></div>
+
   <div class="row2">
     <div class="field"><label>GST Rate</label>
       <select id="g-rate">
-        <option value="0">0%</option><option value="5">5%</option>
-        <option value="12" selected>12%</option><option value="18">18%</option>
-        <option value="28">28%</option><option value="custom">Custom %</option>
-      </select>
-    </div>
-    <div class="field" id="g-cwrap" style="display:none"><label>Custom %</label>
+        <option value="0">0%</option>
+        <option value="5">5%</option>
+        <option value="12" selected>12%</option>
+        <option value="18">18%</option>
+        <option value="28">28%</option>
+        <option value="custom">Custom %</option>
+      </select></div>
+    <div class="field" id="g-cwrap" style="display:none"><label>Custom Rate (%)</label>
       <input type="number" id="g-custom" placeholder="e.g. 3" inputmode="decimal"></div>
     <div class="field" id="g-mwrap"><label>Mode</label>
       <select id="g-mode">
-        <option value="add">Add GST (exclusive)</option>
-        <option value="rm">Remove GST (inclusive)</option>
-      </select>
-    </div>
+        <option value="add">Add GST  →  total incl. GST</option>
+        <option value="rm">Remove GST  →  base price</option>
+      </select></div>
   </div>
+
   <button class="go-btn" onclick="calcGST()">Calculate GST →</button>
-  <div class="result-box" id="gst-res"></div>
+  <div class="res-box" id="gst-res"></div>
+</div>
 </div>
 
-<!-- ════ MARGIN ════ -->
-<div class="card" id="tab-margin">
-  <div class="card-title">Margin & Markup</div>
-  <div class="card-sub">Find selling price, margin %, markup %</div>
+<!-- ════ MARGIN TAB ════ -->
+<div class="tab" id="tab-margin">
+<div class="form-pad">
+  <div class="t-title">Margin & Markup</div>
+  <div class="t-sub">Find selling price, gross margin %, markup %</div>
+
   <div class="row2">
     <div class="field"><label>Cost Price (₹)</label>
-      <input type="number" id="m-cost" placeholder="500" inputmode="decimal"></div>
+      <input type="number" id="m-cost" placeholder="e.g. 500" inputmode="decimal"></div>
     <div class="field"><label>Selling Price (₹)</label>
-      <input type="number" id="m-sell" placeholder="750" inputmode="decimal"></div>
+      <input type="number" id="m-sell" placeholder="e.g. 750" inputmode="decimal"></div>
   </div>
-  <div class="field"><label>Or find selling price from</label>
+
+  <div class="field"><label>Mode</label>
     <select id="m-mode">
-      <option value="calc">Calculate from both prices</option>
-      <option value="margin">Target Margin %</option>
-      <option value="markup">Target Markup %</option>
-    </select>
-  </div>
+      <option value="calc">Calculate from both prices above</option>
+      <option value="margin">Find selling price from Margin %</option>
+      <option value="markup">Find selling price from Markup %</option>
+    </select></div>
   <div class="field" id="m-pwrap" style="display:none"><label>Target %</label>
     <input type="number" id="m-pct" placeholder="e.g. 30" inputmode="decimal"></div>
+
   <button class="go-btn" onclick="calcMargin()">Calculate →</button>
-  <div class="result-box" id="margin-res"></div>
+  <div class="res-box" id="margin-res"></div>
+</div>
 </div>
 
-<!-- ════ DISCOUNT ════ -->
-<div class="card" id="tab-discount">
-  <div class="card-title">Discount</div>
-  <div class="card-sub">Final price after discount, savings amount</div>
-  <div class="field"><label>Original Price (₹)</label>
+<!-- ════ DISCOUNT TAB ════ -->
+<div class="tab" id="tab-discount">
+<div class="form-pad">
+  <div class="t-title">Discount</div>
+  <div class="t-sub">Final price after discount · savings amount · % saved</div>
+
+  <div class="field"><label>Original / MRP Price (₹)</label>
     <input type="number" id="d-price" placeholder="e.g. 2000" inputmode="decimal"></div>
   <div class="row2">
-    <div class="field"><label>Discount</label>
+    <div class="field"><label>Discount Value</label>
       <input type="number" id="d-val" placeholder="e.g. 15" inputmode="decimal"></div>
     <div class="field"><label>Type</label>
       <select id="d-type">
         <option value="pct">Percent (%)</option>
-        <option value="flat">Flat Amount (₹)</option>
-      </select>
-    </div>
+        <option value="flat">Flat (₹)</option>
+      </select></div>
   </div>
+
   <button class="go-btn" onclick="calcDiscount()">Calculate →</button>
-  <div class="result-box" id="disc-res"></div>
+  <div class="res-box" id="disc-res"></div>
+</div>
 </div>
 
-<!-- ════ EMI ════ -->
-<div class="card" id="tab-emi">
-  <div class="card-title">EMI / Loan</div>
-  <div class="card-sub">Monthly instalment, total interest, total payable</div>
+<!-- ════ EMI TAB ════ -->
+<div class="tab" id="tab-emi">
+<div class="form-pad">
+  <div class="t-title">EMI / Loan</div>
+  <div class="t-sub">Monthly instalment · total interest · total payable</div>
+
   <div class="field"><label>Loan Amount (₹)</label>
     <input type="number" id="e-p" placeholder="e.g. 500000" inputmode="decimal"></div>
   <div class="row2">
     <div class="field"><label>Annual Rate (%)</label>
-      <input type="number" id="e-r" placeholder="12" inputmode="decimal" step="0.1"></div>
+      <input type="number" id="e-r" placeholder="e.g. 12" inputmode="decimal" step="0.1"></div>
     <div class="field"><label>Tenure</label>
-      <input type="number" id="e-n" placeholder="24" inputmode="numeric"></div>
+      <input type="number" id="e-n" placeholder="e.g. 24" inputmode="numeric"></div>
   </div>
   <div class="field"><label>Tenure Unit</label>
-    <select id="e-t"><option value="months">Months</option><option value="years">Years</option></select>
-  </div>
+    <select id="e-t"><option value="months">Months</option><option value="years">Years</option></select></div>
+
   <button class="go-btn" onclick="calcEMI()">Calculate EMI →</button>
-  <div class="result-box" id="emi-res"></div>
+  <div class="res-box" id="emi-res"></div>
+</div>
 </div>
 
-<!-- ════ P&L ════ -->
-<div class="card" id="tab-pl">
-  <div class="card-title">Profit & Loss</div>
-  <div class="card-sub">Net profit, net margin %, break-even analysis</div>
+<!-- ════ P&L TAB ════ -->
+<div class="tab" id="tab-pl">
+<div class="form-pad">
+  <div class="t-title">Profit & Loss</div>
+  <div class="t-sub">Net profit · margin % · break-even analysis</div>
+
   <div class="row2">
-    <div class="field"><label>Revenue (₹)</label>
-      <input type="number" id="p-rev" placeholder="100000" inputmode="decimal"></div>
+    <div class="field"><label>Revenue / Sales (₹)</label>
+      <input type="number" id="p-rev" placeholder="e.g. 100000" inputmode="decimal"></div>
     <div class="field"><label>Total Cost (₹)</label>
-      <input type="number" id="p-cost" placeholder="70000" inputmode="decimal"></div>
+      <input type="number" id="p-cost" placeholder="e.g. 70000" inputmode="decimal"></div>
   </div>
   <div class="row2">
-    <div class="field"><label>Units Sold <span style="color:var(--muted);font-size:9px">(optional)</span></label>
+    <div class="field"><label>Units Sold <small>(optional)</small></label>
       <input type="number" id="p-units" placeholder="e.g. 200" inputmode="numeric"></div>
-    <div class="field"><label>Fixed Costs (₹) <span style="color:var(--muted);font-size:9px">(optional)</span></label>
+    <div class="field"><label>Fixed Costs ₹ <small>(optional)</small></label>
       <input type="number" id="p-fixed" placeholder="e.g. 20000" inputmode="decimal"></div>
   </div>
+
   <button class="go-btn" onclick="calcPL()">Calculate →</button>
-  <div class="result-box" id="pl-res"></div>
+  <div class="res-box" id="pl-res"></div>
+</div>
 </div>
 
-<!-- ════ CURRENCY ════ -->
-<div class="card" id="tab-currency">
-  <div class="card-title">Currency</div>
-  <div class="card-sub">Quick currency conversion at manual rate</div>
+<!-- ════ CURRENCY TAB ════ -->
+<div class="tab" id="tab-currency">
+<div class="form-pad">
+  <div class="t-title">Currency</div>
+  <div class="t-sub">Quick currency conversion at manual rate</div>
+
   <div class="field"><label>Amount</label>
     <input type="number" id="cx-amt" placeholder="e.g. 1000" inputmode="decimal"></div>
   <div class="row2">
@@ -449,77 +716,94 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex
         <option value="INR">INR ₹</option><option value="USD">USD $</option>
         <option value="EUR">EUR €</option><option value="GBP">GBP £</option>
         <option value="AED">AED</option><option value="SGD">SGD</option><option value="JPY">JPY ¥</option>
-      </select>
-    </div>
+      </select></div>
     <div class="field"><label>To</label>
       <select id="cx-to">
         <option value="USD" selected>USD $</option><option value="INR">INR ₹</option>
         <option value="EUR">EUR €</option><option value="GBP">GBP £</option>
         <option value="AED">AED</option><option value="SGD">SGD</option><option value="JPY">JPY ¥</option>
-      </select>
-    </div>
+      </select></div>
   </div>
   <div class="field">
-    <label>Exchange Rate (1 <span id="cx-fl">INR</span> = ? <span id="cx-tl">USD</span>)</label>
-    <input type="number" id="cx-rate" placeholder="e.g. 0.012" inputmode="decimal" step="any">
-  </div>
+    <label>Rate: 1 <span id="cx-fl">INR</span> = ? <span id="cx-tl">USD</span></label>
+    <input type="number" id="cx-rate" placeholder="e.g. 0.012" inputmode="decimal" step="any"></div>
+
   <button class="go-btn" onclick="calcCX()">Convert →</button>
-  <div class="result-box" id="cx-res"></div>
+  <div class="res-box" id="cx-res"></div>
+</div>
 </div>
 
-<!-- ════ HISTORY ════ -->
-<div class="card" id="tab-history">
-  <div class="card-title">Calculation Log</div>
-  <div class="card-sub">All calculations this session</div>
+<!-- ════ HISTORY TAB ════ -->
+<div class="tab" id="tab-history">
+<div class="form-pad">
+  <div class="t-title">Calculation Log</div>
+  <div class="t-sub">All calculations this session</div>
   <div id="hist-list"><div class="no-hist">Nothing yet.<br>Start calculating! 🧮</div></div>
-  <button class="clr-btn" onclick="clearHist()">🗑 Clear Log</button>
+  <button class="clr-btn" onclick="clearHist()">🗑  Clear Log</button>
+</div>
 </div>
 
-</div><!-- /scroll-area -->
+</div><!-- /scroll -->
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-calc" onclick="goTab('calc')">
-    <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4M8 18h2"/></svg>Calc
+  <button class="nb active" id="nav-calc"     onclick="goTab('calc')">
+    <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>Calc
   </button>
-  <button class="nav-btn" id="nav-gst" onclick="goTab('gst')">
+  <button class="nb" id="nav-gst"             onclick="goTab('gst')">
     <svg viewBox="0 0 24 24"><path d="M9 14l6-6M9.5 8.5a.5.5 0 11-1 0 .5.5 0 011 0zM15.5 14.5a.5.5 0 11-1 0 .5.5 0 011 0z"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>GST
   </button>
-  <button class="nav-btn" id="nav-margin" onclick="goTab('margin')">
+  <button class="nb" id="nav-margin"          onclick="goTab('margin')">
     <svg viewBox="0 0 24 24"><path d="M3 17l4-8 4 4 4-6 4 4"/></svg>Margin
   </button>
-  <button class="nav-btn" id="nav-discount" onclick="goTab('discount')">
-    <svg viewBox="0 0 24 24"><path d="M7 7h.01M17 17h.01M3 12a9 9 0 1018 0 9 9 0 00-18 0zM7 7l10 10"/></svg>Disc.
+  <button class="nb" id="nav-discount"        onclick="goTab('discount')">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/><path d="M5 5l14 14"/></svg>Disc.
   </button>
-  <button class="nav-btn" id="nav-emi" onclick="goTab('emi')">
+  <button class="nb" id="nav-emi"             onclick="goTab('emi')">
     <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M7 15h2M12 15h2"/></svg>EMI
   </button>
-  <button class="nav-btn" id="nav-pl" onclick="goTab('pl')">
-    <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>P&L
+  <button class="nb" id="nav-pl"              onclick="goTab('pl')">
+    <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>P&amp;L
   </button>
-  <button class="nav-btn" id="nav-currency" onclick="goTab('currency')">
+  <button class="nb" id="nav-currency"        onclick="goTab('currency')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3c3 4 3 14 0 18M3 12h18"/></svg>FX
   </button>
-  <button class="nav-btn" id="nav-history" onclick="goTab('history')">
+  <button class="nb" id="nav-history"         onclick="goTab('history')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Log
   </button>
 </nav>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   CALCULATOR ENGINE — matches Apple iOS / Samsung behaviour exactly
+/* ═══════════════════════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════════════════════ */
+function toggleTheme() {
+  const light = document.body.classList.toggle('light');
+  document.getElementById('theme-fab').textContent = light ? '🌙' : '☀️';
+  document.querySelector('meta[name="theme-color"]').content = light ? '#ebebeb' : '#1c1c1c';
+}
 
-   State machine:
-     display  = string shown on screen (what user typed OR result)
-     firstOp  = left-hand operand (number)
-     operator = '+' '-' '*' '/'  (pending)
-     newNum   = true when next digit should START a fresh number
-                (after pressing an operator or =)
-     lastWasEq = true right after =, so pressing = again repeats op
-     lastB    = the right-hand operand used in last =, for repeat
-═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════════════ */
+function goTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  document.getElementById('scroll').scrollTo(0, 0);
+}
 
-let display   = '0';
+/* ═══════════════════════════════════════════════════════════
+   CALCULATOR ENGINE
+   Exactly like Apple/Samsung:
+   • display  = raw number string (no commas) — used for all math
+   • Screen   = display formatted with commas  — display only
+   • %  with +/-: percent OF firstOp  (500+10% → 50 → 550)
+   • %  with ×/÷: divide by 100       (200×15% → 0.15 → 30)
+   • Repeat =    : repeats last (op, b)  (5+3====→8,11,14)
+═══════════════════════════════════════════════════════════ */
+let display   = '0';   // raw, no commas
 let firstOp   = null;
 let operator  = null;
 let newNum    = false;
@@ -527,93 +811,111 @@ let lastWasEq = false;
 let lastB     = null;
 
 const elNum  = () => document.getElementById('c-num');
-const elHist = () => document.getElementById('c-hist');
+const elExpr = () => document.getElementById('c-expr');
 const elTag  = () => document.getElementById('c-tag');
 
-// ── Render display ──────────────────────────────────────────
-function render(s) {
-  display = s;
-  const el = elNum();
-  el.textContent = s;
-  const len = s.replace(/[^0-9.]/g,'').length;
-  el.style.fontSize = len > 13 ? '19px'
-                    : len > 10 ? '26px'
-                    : len > 7  ? '32px'
-                    : len > 5  ? '38px'
-                    : '46px';
+/* Add thousand-separator commas to display (visual only) */
+function addCommas(raw) {
+  if (raw === 'Error') return 'Error';
+  const neg   = raw.startsWith('-');
+  const abs   = neg ? raw.slice(1) : raw;
+  const parts = abs.split('.');
+  parts[0]    = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + parts.join('.');
 }
 
-// ── Highlight active operator key ──────────────────────────
-function hilightOp(op) {
+/* Render raw string → store as display, show comma-formatted */
+function render(raw) {
+  display = raw;
+  const el     = elNum();
+  const shown  = addCommas(raw);
+  el.textContent = shown;
+  // Responsive font size
+  const len = shown.replace(/[^0-9.,\-]/g, '').length;
+  el.style.fontSize = (
+    len > 14 ? '22px' :
+    len > 11 ? '30px' :
+    len >  8 ? '38px' :
+    len >  5 ? '48px' : '60px'
+  );
+}
+
+/* Kill floating point noise: 0.1+0.2 → 0.3 */
+function clean(n) {
+  if (!isFinite(n)) return 'Error';
+  return parseFloat(n.toPrecision(10)).toString();
+}
+
+/* Highlight active operator key */
+function litOp(op) {
   ['add','sub','mul','div'].forEach(id => {
-    const k = document.getElementById('key-'+id);
-    if(k) k.classList.remove('active-op');
+    const k = document.getElementById('key-' + id);
+    if (k) k.classList.remove('lit');
   });
-  const map = {'+':'add','-':'sub','*':'mul','/':'div'};
-  if(op && map[op]) {
-    const k = document.getElementById('key-'+map[op]);
-    if(k) k.classList.add('active-op');
+  const map = { '+':'add', '-':'sub', '*':'mul', '/':'div' };
+  if (op && map[op]) {
+    const k = document.getElementById('key-' + map[op]);
+    if (k) k.classList.add('lit');
   }
 }
 
-// ── Clean a float to a readable string (no trailing zeros) ──
-function clean(n) {
-  if (!isFinite(n)) return 'Error';
-  // Round to 10 sig figs to kill floating point noise
-  let s = parseFloat(n.toPrecision(10)).toString();
-  // If scientific notation, keep it
-  return s;
+function compute(a, b, op) {
+  switch (op) {
+    case '+': return a + b;
+    case '-': return a - b;
+    case '*': return a * b;
+    case '/':
+      if (b === 0) { alert('Cannot divide by zero'); return a; }
+      return a / b;
+  }
+  return b;
 }
+function sym(op) { return { '+':'+', '-':'−', '*':'×', '/':'÷' }[op] || op; }
 
-// ── Main key handler ────────────────────────────────────────
+/* MAIN HANDLER */
 function K(k) {
   elTag().textContent = '';
 
-  /* ── DIGITS ─────────────────────────────────────────────── */
+  /* ── Digits ── */
   if ('0123456789'.includes(k)) {
     if (newNum || display === '0') {
-      render(k === '0' && display === '0' ? '0' : k);
+      render(k === '0' && !newNum ? '0' : k);
       newNum = false;
     } else {
-      // Prevent absurdly long input
-      if (display.replace('-','').replace('.','').length >= 15) return;
+      if (display.replace('-','').replace('.','').length >= 12) return;
       render(display + k);
     }
     lastWasEq = false;
-    hilightOp(operator);
+    litOp(operator);
     return;
   }
 
-  /* ── DOT ─────────────────────────────────────────────────── */
+  /* ── Decimal ── */
   if (k === '.') {
-    if (newNum) { render('0.'); newNum = false; lastWasEq = false; hilightOp(operator); return; }
+    if (newNum)               { render('0.'); newNum = false; lastWasEq = false; litOp(operator); return; }
     if (display.includes('.')) return;
     render(display + '.');
-    lastWasEq = false;
-    hilightOp(operator);
+    lastWasEq = false; litOp(operator);
     return;
   }
 
-  /* ── BACKSPACE (not on standard Apple calc but useful) ───── */
+  /* ── Backspace ── */
   if (k === 'DEL') {
-    if (newNum || lastWasEq || display.length <= 1 || display === 'Error') {
-      render('0'); newNum = false; lastWasEq = false;
-    } else {
-      const next = display.slice(0,-1);
-      render(next === '' || next === '-' ? '0' : next);
-    }
+    if (lastWasEq || newNum || display === 'Error') { render('0'); newNum=false; lastWasEq=false; return; }
+    if (display.length <= 1 || (display.length === 2 && display.startsWith('-'))) { render('0'); return; }
+    render(display.slice(0, -1));
     return;
   }
 
-  /* ── ALL CLEAR ───────────────────────────────────────────── */
+  /* ── All Clear ── */
   if (k === 'AC') {
-    display='0'; firstOp=null; operator=null; newNum=false; lastWasEq=false; lastB=null;
-    render('0'); elHist().textContent=''; elTag().textContent='';
-    hilightOp(null);
+    display = '0'; firstOp = null; operator = null; newNum = false; lastWasEq = false; lastB = null;
+    render('0'); elExpr().textContent = ''; elTag().textContent = '';
+    litOp(null);
     return;
   }
 
-  /* ── TOGGLE SIGN +/- ─────────────────────────────────────── */
+  /* ── Toggle sign ── */
   if (k === '+/-') {
     const v = parseFloat(display);
     if (isNaN(v) || v === 0) return;
@@ -621,412 +923,452 @@ function K(k) {
     return;
   }
 
-  /* ── PERCENT % — Apple / Samsung exact behaviour ─────────── */
-  /*
-    Rules (same as iOS Calculator):
-    • If there IS a pending +/- operation:  result = firstOp × (display/100)
-        e.g.  500 + 10%  →  10% of 500 = 50  →  500 + 50 = 550
-        e.g.  500 - 20%  →  20% of 500 = 100 →  500 - 100 = 400
-    • If the pending op is × or ÷, or no pending op:  result = display / 100
-        e.g.  200 × 15%  →  15/100 = 0.15  →  200 × 0.15 = 30
-        e.g.  standalone 50%  →  0.5
-  */
+  /* ── Percent — exact Apple / Samsung logic ──
+       +/−  pending → result = firstOp × (cur / 100)   e.g. 500+10% = 50
+       × /  pending → result = cur / 100               e.g. 200×15% = 0.15
+       standalone   → result = cur / 100               e.g. 50%     = 0.5  */
   if (k === '%') {
     const cur = parseFloat(display);
     if (isNaN(cur)) return;
-    let result;
-    if (operator === '+' || operator === '-') {
-      result = (firstOp || 0) * cur / 100;
-    } else {
-      result = cur / 100;
-    }
+    const result = (operator === '+' || operator === '-')
+      ? (firstOp !== null ? firstOp : 0) * cur / 100
+      : cur / 100;
     render(clean(result));
-    newNum = false;
-    lastWasEq = false;
+    newNum = false; lastWasEq = false;
     return;
   }
 
-  /* ── OPERATORS: + - × ÷ ──────────────────────────────────── */
-  if (['+','-','*','/'].includes(k)) {
+  /* ── Operators ── */
+  if (['+', '-', '*', '/'].includes(k)) {
+    litOp(k);
     lastWasEq = false; lastB = null;
     const cur = parseFloat(display);
-
     if (firstOp !== null && operator !== null && !newNum) {
-      // Chain calculation: evaluate pending first
+      // Chain: evaluate pending first
       const res = compute(firstOp, cur, operator);
       firstOp = res;
       render(clean(res));
-      elHist().textContent = clean(res) + ' ' + opSym(k);
+      elExpr().textContent = addCommas(clean(res)) + ' ' + sym(k);
     } else {
       firstOp = cur;
-      elHist().textContent = clean(cur) + ' ' + opSym(k);
+      elExpr().textContent = addCommas(display) + ' ' + sym(k);
     }
     operator = k;
     newNum = true;
-    hilightOp(k);
     return;
   }
 
-  /* ── EQUALS ──────────────────────────────────────────────── */
+  /* ── Equals ── */
   if (k === '=') {
-    hilightOp(null);
+    litOp(null);
     if (operator === null && !lastWasEq) return;
-
     let a, b;
     if (lastWasEq) {
-      // Repeat last operation (Apple behaviour: 5+3= = = → 5,8,11,14)
-      a = parseFloat(display);
-      b = lastB;
+      a = parseFloat(display); b = lastB;   // repeat last operation
     } else {
       a = firstOp !== null ? firstOp : parseFloat(display);
       b = parseFloat(display);
       lastB = b;
     }
-
     if (isNaN(a) || isNaN(b)) return;
     const res = compute(a, b, operator);
-    const sym = opSym(operator);
-
-    elHist().textContent = clean(a) + ' ' + sym + ' ' + clean(b) + ' =';
+    const s   = sym(operator);
+    elExpr().textContent = addCommas(clean(a)) + ' ' + s + ' ' + addCommas(clean(b)) + ' =';
     render(clean(res));
-    addHist('CALC', clean(a)+' '+sym+' '+clean(b), clean(res));
-
-    firstOp  = res;       // so chaining after = works
-    newNum   = true;
-    lastWasEq = true;
+    addHist('CALC', clean(a) + ' ' + s + ' ' + clean(b), addCommas(clean(res)));
+    firstOp = res; newNum = true; lastWasEq = true;
     return;
   }
 }
 
-function compute(a, b, op) {
-  switch(op) {
-    case '+': return a + b;
-    case '-': return a - b;
-    case '*': return a * b;
-    case '/': return b === 0 ? (alert('Cannot divide by zero'), a) : a / b;
-  }
-  return b;
-}
-function opSym(op) { return {'+':'+','-':'−','*':'×','/':'÷'}[op]||op; }
-
-// Current value for chip panels
-function getVal() { return parseFloat(display) || 0; }
-
-// Keyboard support
+/* Keyboard support (ignored when typing in input fields) */
 document.addEventListener('keydown', e => {
-  if ('0123456789'.includes(e.key))              K(e.key);
-  else if (e.key === '.')                        K('.');
-  else if (['+','-','*','/'].includes(e.key))    K(e.key);
-  else if (e.key==='Enter'||e.key==='=')         K('=');
-  else if (e.key==='Backspace')                  K('DEL');
-  else if (e.key==='Escape')                     K('AC');
-  else if (e.key==='%')                          K('%');
+  const tag = document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if ('0123456789'.includes(e.key))            K(e.key);
+  else if (e.key === '.')                      K('.');
+  else if (['+','-','*','/'].includes(e.key))  K(e.key);
+  else if (e.key === 'Enter' || e.key === '=') K('=');
+  else if (e.key === 'Backspace')              K('DEL');
+  else if (e.key === 'Escape')                 K('AC');
+  else if (e.key === '%')                      K('%');
 });
 
-// Initialise display
+/* Get current screen value as number */
+function getVal() { return parseFloat(display) || 0; }
+
 render('0');
 
-/* ═══════════════════════════════════════════════════════════════
-   CHIP PANELS
-═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   CHIPS
+═══════════════════════════════════════════════════════════ */
 let activeChip = null;
+
 function chipToggle(name) {
   const wasActive = activeChip === name;
-  // close all
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
   document.querySelectorAll('.qpanel').forEach(p => p.classList.remove('show'));
   activeChip = null;
   if (!wasActive) {
     activeChip = name;
-    document.getElementById('chip-'+name).classList.add('on');
-    document.getElementById('qp-'+name).classList.add('show');
+    document.getElementById('chip-' + name).classList.add('on');
+    const panel = document.getElementById('qp-' + name);
+    panel.classList.add('show');
+    setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'nearest' }), 80);
   }
 }
 
-function qOut(id, msg, isOk) {
-  const el = document.getElementById('out-'+id);
-  el.textContent = msg; el.classList.add('show');
-  el.className = 'qp-out show ' + (isOk ? 'ok' : 'err');
+function qOut(key, msg, isOk) {
+  const el = document.getElementById('out-' + key);
+  el.textContent = msg;
+  el.className   = 'qp-out show ' + (isOk ? 'ok' : 'err');
 }
 
-function doGST(rate, selId, outId) {
-  const amt = getVal(); const mode = document.getElementById(selId).value;
-  const id = outId.replace('out-','');
-  if (!amt) return qOut(id, '⚠ Type an amount on the calculator first, then tap Calculate.', false);
+/* ───────────────────────────────────────
+   GST Quick Panel  — BUGFIX:
+   ADD  mode: user typed BASE price        → total = base + base×rate/100
+   REMOVE mode: user typed INCLUSIVE price → base = inclusive × 100/(100+rate)
+─────────────────────────────────────── */
+function doGST(rate, selId, key) {
+  const amt  = getVal();
+  const mode = document.getElementById(selId).value;
+  if (!amt) return qOut(key, '⚠  Type an amount on the calculator first, then tap Calc.', false);
+
   let base, gst, total;
-  if (mode === 'add') { base=amt; gst=amt*rate/100; total=amt+gst; }
-  else { total=amt; base=amt*100/(100+rate); gst=total-base; }
-  qOut(id,
-    'Base Amount  : '+fmt(base)+
-    '\nGST @ '+rate+'%   : '+fmt(gst)+
-    '\nCGST ('+rate/2+'%)  : '+fmt(gst/2)+
-    '\nSGST ('+rate/2+'%)  : '+fmt(gst/2)+
-    '\n─────────────────────'+
-    '\n'+(mode==='add'?'Total (incl.GST)':'Base (excl.GST)')+' : '+fmt(mode==='add'?total:base), true);
-  // Push result to display
-  const result = mode==='add' ? total : base;
-  display = clean(result); render(display);
-  elTag().textContent = mode==='add' ? 'incl. GST '+rate+'%' : 'excl. GST '+rate+'%';
-  newNum=true; lastWasEq=true; firstOp=result;
-  addHist('GST', fmt(amt)+' '+(mode==='add'?'+':'−')+' GST '+rate+'%', fmt(result));
+
+  if (mode === 'add') {
+    /* amt is BASE (exclusive of GST) */
+    base  = amt;
+    gst   = base * rate / 100;          // GST amount
+    total = base + gst;                 // inclusive price
+    qOut(key,
+      'Base Price (excl. GST)  :  ' + fmt(base)  +
+      '\nGST @ ' + rate + '%             :  ' + fmt(gst)   +
+      '\nCGST (' + (rate/2) + '%)         :  ' + fmt(gst/2) +
+      '\nSGST (' + (rate/2) + '%)         :  ' + fmt(gst/2) +
+      '\n────────────────────────────' +
+      '\nTotal (incl. GST)       :  ' + fmt(total), true);
+    render(clean(total));
+    elTag().textContent = 'incl. GST ' + rate + '%';
+  } else {
+    /* amt is INCLUSIVE price — formula: base = incl × 100/(100+rate) */
+    total = amt;
+    base  = total * 100 / (100 + rate);  // correct formula
+    gst   = total - base;
+    qOut(key,
+      'Inclusive Amount entered :  ' + fmt(total) +
+      '\nGST portion @ ' + rate + '%     :  ' + fmt(gst)   +
+      '\nCGST (' + (rate/2) + '%)          :  ' + fmt(gst/2) +
+      '\nSGST (' + (rate/2) + '%)          :  ' + fmt(gst/2) +
+      '\n────────────────────────────' +
+      '\nBase Price (excl. GST)  :  ' + fmt(base), true);
+    render(clean(base));
+    elTag().textContent = 'excl. GST ' + rate + '%';
+  }
+
+  newNum = true; lastWasEq = true; firstOp = parseFloat(display);
+  addHist('GST', fmt(amt) + (mode === 'add' ? ' +' : ' −') + 'GST' + rate + '%',
+    fmt(mode === 'add' ? total : base));
 }
 
 function doRmGST() {
-  const amt = getVal(); const rate = parseFloat(document.getElementById('sel-rmrate').value);
-  if (!amt) return qOut('rmgst','⚠ Type a GST-inclusive amount on the calculator first.',false);
-  const base = amt*100/(100+rate); const gst = amt-base;
+  const total = getVal();
+  const rate  = parseFloat(document.getElementById('sel-rmrate').value);
+  if (!total) return qOut('rmgst', '⚠  Type the GST-inclusive amount on the calculator first.', false);
+  /* Correct formula: base = inclusive × 100 / (100+rate) */
+  const base = total * 100 / (100 + rate);
+  const gst  = total - base;
   qOut('rmgst',
-    'GST-incl Amount : '+fmt(amt)+
-    '\nGST @ '+rate+'%      : '+fmt(gst)+
-    '\n─────────────────────'+
-    '\nBase (excl.GST)  : '+fmt(base), true);
-  display=clean(base); render(display);
-  elTag().textContent='excl. GST '+rate+'%';
-  newNum=true; lastWasEq=true; firstOp=base;
-  addHist('−GST', fmt(amt)+' − GST '+rate+'%', fmt(base));
+    'Inclusive Amount   :  ' + fmt(total) +
+    '\nGST @ ' + rate + '%         :  ' + fmt(gst)   +
+    '\nCGST (' + (rate/2) + '%)     :  ' + fmt(gst/2) +
+    '\nSGST (' + (rate/2) + '%)     :  ' + fmt(gst/2) +
+    '\n────────────────────────' +
+    '\nBase Price (excl.) :  ' + fmt(base), true);
+  render(clean(base));
+  elTag().textContent = 'excl. GST ' + rate + '%';
+  newNum = true; lastWasEq = true; firstOp = base;
+  addHist('−GST', fmt(total) + ' −GST' + rate + '%', fmt(base));
 }
 
 function doMargin() {
-  const cost = getVal(); const mp = parseFloat(document.getElementById('inp-margin').value);
-  if (!cost) return qOut('margin','⚠ Enter cost price on calculator first.',false);
-  if (isNaN(mp)||mp<=0||mp>=100) return qOut('margin','⚠ Margin must be between 1% and 99%.',false);
-  const sell=cost/(1-mp/100); const profit=sell-cost; const mup=(profit/cost)*100;
+  const cost = getVal();
+  const mp   = parseFloat(document.getElementById('inp-margin').value);
+  if (!cost)                  return qOut('margin', '⚠  Enter cost price on calculator first.', false);
+  if (isNaN(mp)||mp<=0||mp>=100) return qOut('margin', '⚠  Margin must be between 1% and 99%.', false);
+  const sell   = cost / (1 - mp / 100);
+  const profit = sell - cost;
+  const markup = (profit / cost) * 100;
   qOut('margin',
-    'Cost Price    : '+fmt(cost)+
-    '\nMargin        : '+pct(mp)+
-    '\nMarkup        : '+pct(mup)+
-    '\nProfit        : '+fmt(profit)+
-    '\n─────────────────────'+
-    '\nSelling Price : '+fmt(sell), true);
-  display=clean(sell); render(display);
-  elTag().textContent='sell price @ '+pct(mp)+' margin';
+    'Cost Price    :  ' + fmt(cost)   +
+    '\nMargin        :  ' + pct(mp)    +
+    '\nMarkup        :  ' + pct(markup)+
+    '\nProfit        :  ' + fmt(profit)+
+    '\n──────────────────────' +
+    '\nSelling Price :  ' + fmt(sell), true);
+  render(clean(sell)); elTag().textContent = 'sell @ ' + pct(mp) + ' margin';
   newNum=true; lastWasEq=true; firstOp=sell;
   addHist('Margin','Cost '+fmt(cost)+' @ '+pct(mp),fmt(sell));
 }
 
 function doMarkup() {
-  const cost = getVal(); const mp = parseFloat(document.getElementById('inp-markup').value);
-  if (!cost) return qOut('markup','⚠ Enter cost price on calculator first.',false);
-  if (isNaN(mp)||mp<=0) return qOut('markup','⚠ Enter a valid markup %.',false);
-  const sell=cost*(1+mp/100); const profit=sell-cost; const margin=(profit/sell)*100;
+  const cost = getVal();
+  const mp   = parseFloat(document.getElementById('inp-markup').value);
+  if (!cost)          return qOut('markup','⚠  Enter cost price on calculator first.', false);
+  if (isNaN(mp)||mp<=0) return qOut('markup','⚠  Enter a valid markup %.', false);
+  const sell   = cost * (1 + mp / 100);
+  const profit = sell - cost;
+  const margin = (profit / sell) * 100;
   qOut('markup',
-    'Cost Price    : '+fmt(cost)+
-    '\nMarkup        : '+pct(mp)+
-    '\nMargin        : '+pct(margin)+
-    '\nProfit        : '+fmt(profit)+
-    '\n─────────────────────'+
-    '\nSelling Price : '+fmt(sell), true);
-  display=clean(sell); render(display);
-  elTag().textContent='sell price @ '+pct(mp)+' markup';
+    'Cost Price    :  ' + fmt(cost)   +
+    '\nMarkup        :  ' + pct(mp)    +
+    '\nMargin        :  ' + pct(margin)+
+    '\nProfit        :  ' + fmt(profit)+
+    '\n──────────────────────' +
+    '\nSelling Price :  ' + fmt(sell), true);
+  render(clean(sell)); elTag().textContent = 'sell @ ' + pct(mp) + ' markup';
   newNum=true; lastWasEq=true; firstOp=sell;
   addHist('Markup','Cost '+fmt(cost)+' @ '+pct(mp),fmt(sell));
 }
 
 function doDiscount() {
-  const price=getVal(); const val=parseFloat(document.getElementById('inp-dval').value);
-  const type=document.getElementById('sel-dtype').value;
-  if (!price) return qOut('discount','⚠ Enter original price on calculator first.',false);
-  if (isNaN(val)||val<=0) return qOut('discount','⚠ Enter discount value.',false);
-  let savings,final;
-  if(type==='pct'){savings=price*val/100;final=price-savings;}
-  else{savings=val;final=price-val;}
-  const ps=(savings/price)*100;
+  const price = getVal();
+  const val   = parseFloat(document.getElementById('inp-dval').value);
+  const type  = document.getElementById('sel-dtype').value;
+  if (!price)           return qOut('discount','⚠  Enter original price on calculator first.', false);
+  if (isNaN(val)||val<=0) return qOut('discount','⚠  Enter a valid discount value.', false);
+  let savings, final;
+  if (type==='pct') { savings = price * val / 100; final = price - savings; }
+  else              { savings = val;                final = price - val;    }
+  if (final < 0) return qOut('discount','⚠  Discount is greater than the price!', false);
+  const ps = (savings / price) * 100;
   qOut('discount',
-    'Original Price : '+fmt(price)+
-    '\nDiscount       : '+fmt(savings)+' ('+pct(ps)+')'+
-    '\n─────────────────────'+
-    '\nFinal Price    : '+fmt(final)+
-    '\nYou Save       : '+fmt(savings), true);
-  display=clean(final); render(display);
-  elTag().textContent='after discount';
+    'Original Price  :  ' + fmt(price)  +
+    '\nDiscount        :  ' + fmt(savings) + ' (' + pct(ps) + ')' +
+    '\n────────────────────────' +
+    '\nFinal Price     :  ' + fmt(final)  +
+    '\nYou Save        :  ' + fmt(savings), true);
+  render(clean(final)); elTag().textContent = 'after discount';
   newNum=true; lastWasEq=true; firstOp=final;
-  addHist('Disc.',fmt(price)+' − '+(type==='pct'?pct(val):fmt(val)),fmt(final));
+  addHist('Disc.',fmt(price)+' −'+(type==='pct'?pct(val):fmt(val)),fmt(final));
 }
 
 function doSplit() {
-  const total=getVal(); const n=parseInt(document.getElementById('inp-split').value);
-  if(!total) return qOut('split','⚠ Enter total bill on calculator first.',false);
-  if(isNaN(n)||n<1) return qOut('split','⚠ Enter number of people (min 1).',false);
-  const each=total/n;
+  const total = getVal();
+  const n     = parseInt(document.getElementById('inp-split').value);
+  if (!total)        return qOut('split','⚠  Enter total bill on calculator first.', false);
+  if (isNaN(n)||n<1) return qOut('split','⚠  Enter number of people (minimum 1).', false);
+  const each = total / n;
   qOut('split',
-    'Total Bill  : '+fmt(total)+
-    '\nPeople      : '+n+
-    '\n─────────────────────'+
-    '\nEach Pays   : '+fmt(each), true);
-  addHist('Split',fmt(total)+'÷'+n,fmt(each));
+    'Total Bill  :  ' + fmt(total) +
+    '\nPeople      :  ' + n         +
+    '\n──────────────────' +
+    '\nEach Pays   :  ' + fmt(each), true);
+  addHist('Split',fmt(total)+'÷'+n+' people',fmt(each));
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    HISTORY
-═══════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════ */
 const hist = [];
-function addHist(type,desc,res) { hist.unshift({type,desc,res}); renderHist(); }
+function addHist(type, desc, res) { hist.unshift({type,desc,res}); renderHist(); }
 function renderHist() {
-  const el=document.getElementById('hist-list');
-  if(!hist.length){el.innerHTML='<div class="no-hist">Nothing yet.<br>Start calculating! 🧮</div>';return;}
-  el.innerHTML=hist.slice(0,60).map(h=>
-    `<div class="hist-item"><div class="hist-top"><span class="hist-badge">${h.type}</span><span class="hist-res">${h.res}</span></div><div class="hist-desc">${h.desc}</div></div>`
-  ).join('');
+  const el = document.getElementById('hist-list');
+  if (!hist.length) { el.innerHTML = '<div class="no-hist">Nothing yet.<br>Start calculating! 🧮</div>'; return; }
+  el.innerHTML = hist.slice(0,60).map(h =>
+    `<div class="hist-item">
+       <div class="hist-top"><span class="hist-badge">${h.type}</span><span class="hist-val">${h.res}</span></div>
+       <div class="hist-desc">${h.desc}</div>
+     </div>`).join('');
 }
-function clearHist(){hist.length=0;renderHist();}
+function clearHist() { hist.length=0; renderHist(); }
 
-/* ═══════════════════════════════════════════════════════════════
-   NAV
-═══════════════════════════════════════════════════════════════ */
-function goTab(name) {
-  document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
-  document.querySelector('.scroll-area').scrollTo(0,0);
-}
-
-/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    HELPERS
-═══════════════════════════════════════════════════════════════ */
-const fmt  = n => isNaN(n)?'—':'₹\u202f'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+═══════════════════════════════════════════════════════════ */
+const fmt  = n => isNaN(n) ? '—' : '₹\u202f' + Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtN = (n,d=2) => Number(n).toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d});
-const pct  = n => fmtN(n)+'%';
-function rrow(k,v,cls=''){return `<div class="rrow${cls.includes('hi')?' big':''}"><span class="rkey">${k}</span><span class="rval ${cls}">${v}</span></div>`;}
-function showRes(id,html){
-  const el=document.getElementById(id);el.innerHTML=html;el.classList.add('show');
-  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),60);
+const pct  = n => fmtN(n) + '%';
+
+function rr(k, v, cls='') {
+  return `<div class="rr${cls.includes('accent') ? ' hl' : ''}">
+    <span class="rk">${k}</span><span class="rv ${cls}">${v}</span>
+  </div>`;
+}
+function showRes(id, html) {
+  const el = document.getElementById(id);
+  el.innerHTML = html; el.classList.add('show');
+  setTimeout(() => el.scrollIntoView({behavior:'smooth', block:'nearest'}), 60);
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    BUSINESS CALCULATORS
-═══════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════ */
 
-// GST tab
-document.getElementById('g-rate').addEventListener('change',function(){
-  document.getElementById('g-cwrap').style.display=this.value==='custom'?'block':'none';
-  document.getElementById('g-mwrap').style.display=this.value==='custom'?'none':'block';
+/* GST Tab */
+document.getElementById('g-rate').addEventListener('change', function() {
+  document.getElementById('g-cwrap').style.display = this.value==='custom' ? 'block' : 'none';
+  document.getElementById('g-mwrap').style.display = this.value==='custom' ? 'none'  : 'block';
 });
-function calcGST(){
-  const amt=parseFloat(document.getElementById('g-amt').value);
-  const rEl=document.getElementById('g-rate').value;
-  const rate=rEl==='custom'?parseFloat(document.getElementById('g-custom').value):parseFloat(rEl);
-  const mode=document.getElementById('g-mode').value;
-  if(isNaN(amt)||amt<=0)return alert('Enter a valid amount.');
-  if(isNaN(rate))return alert('Enter a valid GST rate.');
-  let base,gst,total;
-  if(mode==='add'){base=amt;gst=amt*rate/100;total=amt+gst;}
-  else{total=amt;base=amt*100/(100+rate);gst=total-base;}
-  showRes('gst-res',
-    rrow('Base Amount',fmt(base))+
-    rrow('GST @ '+rate+'%',fmt(gst),'hi')+
-    rrow('CGST ('+rate/2+'%)',fmt(gst/2),'teal')+
-    rrow('SGST ('+rate/2+'%)',fmt(gst/2),'teal')+
-    rrow(mode==='add'?'Total (incl. GST)':'Base (excl. GST)',fmt(mode==='add'?total:base),'green'));
-  addHist('GST',fmt(base)+' @ '+rate+'%',fmt(mode==='add'?total:base));
+function calcGST() {
+  const amt  = parseFloat(document.getElementById('g-amt').value);
+  const rEl  = document.getElementById('g-rate').value;
+  const rate = rEl==='custom' ? parseFloat(document.getElementById('g-custom').value) : parseFloat(rEl);
+  const mode = document.getElementById('g-mode').value;
+  if (isNaN(amt)||amt<=0)  return alert('Enter a valid amount.');
+  if (isNaN(rate)||rate<0) return alert('Enter a valid GST rate.');
+
+  let base, gst, total;
+  if (mode === 'add') {
+    base  = amt;
+    gst   = base * rate / 100;
+    total = base + gst;
+    showRes('gst-res',
+      rr('Base Price (excl. GST)', fmt(base)) +
+      rr('GST @ ' + rate + '%', fmt(gst), 'accent') +
+      rr('CGST (' + (rate/2) + '%)', fmt(gst/2), 'blue') +
+      rr('SGST (' + (rate/2) + '%)', fmt(gst/2), 'blue') +
+      rr('Total (incl. GST)', fmt(total), 'green'));
+    addHist('GST+', fmt(base)+' +GST'+rate+'%', fmt(total));
+  } else {
+    /* REMOVE: amt is the INCLUSIVE price */
+    total = amt;
+    base  = total * 100 / (100 + rate);   // ← correct formula
+    gst   = total - base;
+    showRes('gst-res',
+      rr('Amount Entered (incl. GST)', fmt(total)) +
+      rr('GST portion @ ' + rate + '%', fmt(gst), 'accent') +
+      rr('CGST (' + (rate/2) + '%)', fmt(gst/2), 'blue') +
+      rr('SGST (' + (rate/2) + '%)', fmt(gst/2), 'blue') +
+      rr('Base Price (excl. GST)', fmt(base), 'green'));
+    addHist('GST−', fmt(total)+' −GST'+rate+'%', fmt(base));
+  }
 }
 
-// Margin tab
-document.getElementById('m-mode').addEventListener('change',function(){
-  document.getElementById('m-pwrap').style.display=this.value!=='calc'?'block':'none';
+/* Margin Tab */
+document.getElementById('m-mode').addEventListener('change', function() {
+  document.getElementById('m-pwrap').style.display = this.value !== 'calc' ? 'block' : 'none';
 });
-function calcMargin(){
-  const cost=parseFloat(document.getElementById('m-cost').value);
-  const mode=document.getElementById('m-mode').value;
-  if(isNaN(cost)||cost<=0)return alert('Enter a valid cost price.');
-  let sell,margin,markup;
-  if(mode==='calc'){
-    sell=parseFloat(document.getElementById('m-sell').value);
-    if(isNaN(sell))return alert('Enter selling price.');
-    margin=((sell-cost)/sell)*100;markup=((sell-cost)/cost)*100;
-  }else{
-    const p=parseFloat(document.getElementById('m-pct').value);
-    if(isNaN(p))return alert('Enter target %.');
-    if(mode==='margin'){sell=cost/(1-p/100);margin=p;markup=((sell-cost)/cost)*100;}
-    else{sell=cost*(1+p/100);markup=p;margin=((sell-cost)/sell)*100;}
+function calcMargin() {
+  const cost = parseFloat(document.getElementById('m-cost').value);
+  const mode = document.getElementById('m-mode').value;
+  if (isNaN(cost)||cost<=0) return alert('Enter a valid cost price.');
+  let sell, margin, markup;
+  if (mode === 'calc') {
+    sell = parseFloat(document.getElementById('m-sell').value);
+    if (isNaN(sell)||sell<=0) return alert('Enter a valid selling price.');
+    margin = ((sell-cost)/sell)*100;
+    markup = ((sell-cost)/cost)*100;
+  } else {
+    const p = parseFloat(document.getElementById('m-pct').value);
+    if (isNaN(p)||p<=0) return alert('Enter a valid target %.');
+    if (mode==='margin') {
+      if (p>=100) return alert('Margin must be less than 100%.');
+      sell=cost/(1-p/100); margin=p; markup=((sell-cost)/cost)*100;
+    } else {
+      sell=cost*(1+p/100); markup=p; margin=((sell-cost)/sell)*100;
+    }
   }
-  const profit=sell-cost;
+  const profit = sell - cost;
   showRes('margin-res',
-    rrow('Selling Price',fmt(sell),'hi')+
-    rrow('Cost Price',fmt(cost))+
-    rrow('Gross Profit',fmt(profit),profit>=0?'green':'red')+
-    rrow('Gross Margin',pct(margin),'teal')+
-    rrow('Markup %',pct(markup),'teal'));
+    rr('Selling Price', fmt(sell), 'accent') +
+    rr('Cost Price', fmt(cost)) +
+    rr('Gross Profit', fmt(profit), profit>=0?'green':'red') +
+    rr('Gross Margin', pct(margin), 'blue') +
+    rr('Markup %', pct(markup), 'blue'));
   addHist('Margin','Cost '+fmt(cost)+' → Sell '+fmt(sell),'Margin '+pct(margin));
 }
 
-// Discount tab
-function calcDiscount(){
-  const price=parseFloat(document.getElementById('d-price').value);
-  const disc=parseFloat(document.getElementById('d-val').value);
-  const type=document.getElementById('d-type').value;
-  if(isNaN(price)||isNaN(disc))return alert('Enter valid values.');
-  let savings,final,ps;
-  if(type==='pct'){savings=price*disc/100;final=price-savings;ps=disc;}
-  else{savings=disc;final=price-disc;ps=(disc/price)*100;}
+/* Discount Tab */
+function calcDiscount() {
+  const price = parseFloat(document.getElementById('d-price').value);
+  const disc  = parseFloat(document.getElementById('d-val').value);
+  const type  = document.getElementById('d-type').value;
+  if (isNaN(price)||price<=0) return alert('Enter a valid price.');
+  if (isNaN(disc)||disc<=0)   return alert('Enter a valid discount.');
+  let savings, final, ps;
+  if (type==='pct') { savings=price*disc/100; final=price-savings; ps=disc; }
+  else              { savings=disc; final=price-disc; ps=(disc/price)*100; }
+  if (final<0) return alert('Discount cannot exceed the price.');
   showRes('disc-res',
-    rrow('Original Price',fmt(price))+
-    rrow('Discount',fmt(savings)+' ('+pct(ps)+')','red')+
-    rrow('Final Price',fmt(final),'hi')+
-    rrow('You Save',fmt(savings),'green'));
-  addHist('Discount',fmt(price)+' − '+(type==='pct'?pct(disc):fmt(disc)),fmt(final));
+    rr('Original Price', fmt(price)) +
+    rr('Discount', fmt(savings)+' ('+pct(ps)+')', 'red') +
+    rr('Final Price', fmt(final), 'accent') +
+    rr('You Save', fmt(savings), 'green'));
+  addHist('Discount',fmt(price)+' −'+(type==='pct'?pct(disc):fmt(disc)),fmt(final));
 }
 
-// EMI tab
-function calcEMI(){
-  const P=parseFloat(document.getElementById('e-p').value);
-  const ar=parseFloat(document.getElementById('e-r').value);
-  let n=parseFloat(document.getElementById('e-n').value);
-  if(isNaN(P)||isNaN(ar)||isNaN(n))return alert('Enter all values.');
-  if(document.getElementById('e-t').value==='years')n*=12;
-  const r=ar/12/100;
-  const emi=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
-  const total=emi*n;const interest=total-P;
+/* EMI Tab */
+function calcEMI() {
+  const P  = parseFloat(document.getElementById('e-p').value);
+  const ar = parseFloat(document.getElementById('e-r').value);
+  let   n  = parseFloat(document.getElementById('e-n').value);
+  if (isNaN(P)||P<=0)  return alert('Enter a valid loan amount.');
+  if (isNaN(ar)||ar<0) return alert('Enter a valid interest rate.');
+  if (isNaN(n)||n<=0)  return alert('Enter a valid tenure.');
+  if (document.getElementById('e-t').value === 'years') n *= 12;
+  const r   = ar / 12 / 100;
+  const emi = r===0 ? P/n : P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  const total=emi*n; const interest=total-P;
   showRes('emi-res',
-    rrow('Monthly EMI',fmt(emi),'hi')+
-    rrow('Loan Amount',fmt(P))+
-    rrow('Total Interest',fmt(interest),'red')+
-    rrow('Total Payable',fmt(total),'green')+
-    rrow('Tenure',fmtN(n,0)+' months')+
-    `<div class="rnote">Interest = ${pct(interest/P*100)} of principal · Total = ${pct(total/P*100)} of loan</div>`);
+    rr('Monthly EMI', fmt(emi), 'accent') +
+    rr('Loan Amount', fmt(P)) +
+    rr('Total Interest', fmt(interest), 'red') +
+    rr('Total Payable', fmt(total), 'green') +
+    rr('Tenure', fmtN(n,0)+' months') +
+    `<div class="rnote">Interest = ${pct(interest/P*100)} of principal · Total cost = ${pct(total/P*100)} of loan</div>`);
   addHist('EMI',fmt(P)+' @ '+ar+'% / '+fmtN(n,0)+'mo',fmt(emi)+'/mo');
 }
 
-// P&L tab
-function calcPL(){
-  const rev=parseFloat(document.getElementById('p-rev').value);
-  const cost=parseFloat(document.getElementById('p-cost').value);
-  const units=parseFloat(document.getElementById('p-units').value);
-  const fixed=parseFloat(document.getElementById('p-fixed').value);
-  if(isNaN(rev)||isNaN(cost))return alert('Enter revenue and cost.');
-  const profit=rev-cost;const margin=(profit/rev)*100;const isP=profit>=0;
+/* P&L Tab */
+function calcPL() {
+  const rev   = parseFloat(document.getElementById('p-rev').value);
+  const cost  = parseFloat(document.getElementById('p-cost').value);
+  const units = parseFloat(document.getElementById('p-units').value);
+  const fixed = parseFloat(document.getElementById('p-fixed').value);
+  if (isNaN(rev)||rev<=0)   return alert('Enter valid revenue.');
+  if (isNaN(cost)||cost<=0) return alert('Enter valid cost.');
+  const profit = rev-cost; const margin=(profit/rev)*100; const isP=profit>=0;
   let extra='';
-  if(!isNaN(units)&&units>0)extra+=rrow('Profit / Unit',fmt(profit/units),isP?'green':'red');
-  if(!isNaN(fixed)&&fixed>0&&!isNaN(units)&&units>0){
-    const cm=(rev/units)-(cost-fixed)/units;
+  if (!isNaN(units)&&units>0)
+    extra += rr('Profit per Unit', fmt(profit/units), isP?'green':'red');
+  if (!isNaN(fixed)&&fixed>0&&!isNaN(units)&&units>0) {
+    const varCPU=(cost-fixed)/units, priceU=rev/units;
+    const cm=priceU-varCPU;
     const beU=cm>0?Math.ceil(fixed/cm):Infinity;
-    extra+=rrow('Break-Even Units',isFinite(beU)?fmtN(beU,0)+' units':'∞','teal');
-    if(isFinite(beU))extra+=rrow('Break-Even Revenue',fmt(beU*(rev/units)),'teal');
+    extra += rr('Break-Even Units', isFinite(beU)?fmtN(beU,0)+' units':'∞','blue');
+    if(isFinite(beU)) extra += rr('Break-Even Revenue',fmt(beU*priceU),'blue');
   }
   showRes('pl-res',
-    rrow('Net Profit/Loss',fmt(profit),isP?'green hi':'red hi')+
-    rrow('Status',isP?'✅ PROFIT':'❌ LOSS',isP?'green':'red')+
-    rrow('Revenue',fmt(rev))+
-    rrow('Total Cost',fmt(cost))+
-    rrow('Net Margin',pct(margin),isP?'green':'red')+extra);
+    rr('Net Profit / Loss', fmt(profit), isP?'green accent':'red accent') +
+    rr('Status', isP?'✅  PROFIT':'❌  LOSS', isP?'green':'red') +
+    rr('Revenue', fmt(rev)) +
+    rr('Total Cost', fmt(cost)) +
+    rr('Net Margin', pct(margin), isP?'green':'red') +
+    extra);
   addHist('P&L','Rev '+fmt(rev)+' | Cost '+fmt(cost),fmt(profit));
 }
 
-// Currency tab
-document.getElementById('cx-from').addEventListener('change',()=>{document.getElementById('cx-fl').textContent=document.getElementById('cx-from').value;});
-document.getElementById('cx-to').addEventListener('change',()=>{document.getElementById('cx-tl').textContent=document.getElementById('cx-to').value;});
-function calcCX(){
-  const amt=parseFloat(document.getElementById('cx-amt').value);
-  const rate=parseFloat(document.getElementById('cx-rate').value);
-  const from=document.getElementById('cx-from').value;
-  const to=document.getElementById('cx-to').value;
-  if(isNaN(amt)||isNaN(rate)||rate<=0)return alert('Enter valid amount and rate.');
-  const converted=amt*rate;
+/* Currency Tab */
+document.getElementById('cx-from').addEventListener('change',()=>{
+  document.getElementById('cx-fl').textContent=document.getElementById('cx-from').value;
+});
+document.getElementById('cx-to').addEventListener('change',()=>{
+  document.getElementById('cx-tl').textContent=document.getElementById('cx-to').value;
+});
+function calcCX() {
+  const amt  = parseFloat(document.getElementById('cx-amt').value);
+  const rate = parseFloat(document.getElementById('cx-rate').value);
+  const from = document.getElementById('cx-from').value;
+  const to   = document.getElementById('cx-to').value;
+  if (isNaN(amt)||amt<=0)   return alert('Enter a valid amount.');
+  if (isNaN(rate)||rate<=0) return alert('Enter a valid exchange rate.');
+  const converted = amt * rate;
   showRes('cx-res',
-    rrow('Converted',fmtN(converted,2)+' '+to,'hi')+
-    rrow(from+' Amount',fmtN(amt,2)+' '+from)+
-    rrow('Rate Used','1 '+from+' = '+fmtN(rate,4)+' '+to)+
-    rrow('Inverse Rate','1 '+to+' = '+fmtN(1/rate,4)+' '+from,'teal'));
+    rr('Converted', fmtN(converted,2)+' '+to,'accent') +
+    rr(from+' Amount', fmtN(amt,2)+' '+from) +
+    rr('Rate Used','1 '+from+' = '+fmtN(rate,4)+' '+to) +
+    rr('Inverse','1 '+to+' = '+fmtN(1/rate,4)+' '+from,'blue'));
   addHist('FX',fmtN(amt,2)+' '+from+' → '+to,fmtN(converted,2)+' '+to);
 }
 </script>
